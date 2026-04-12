@@ -4,6 +4,13 @@ import socket
 HOST = "127.0.0.1"
 PORT = 8080
 BUFFER_SIZE = 4096
+HTML_BODY = """<html>
+<head><title>My Micro Server</title></head>
+<body>
+    <h1>It works!</h1>
+    <p>This is a basic response from my Python socket server.</p>
+</body>
+</html>"""
 
 
 def main():
@@ -32,7 +39,17 @@ def main():
             print("Raw HTTP request:")
             print(request_data.decode("utf-8", errors="replace"))
 
-            # Close the client connection after printing the request.
+            # Send a basic HTTP response with a simple HTML page.
+            body_bytes = HTML_BODY.encode("utf-8")
+            response = (
+                "HTTP/1.1 200 OK\r\n"
+                "Content-Type: text/html; charset=utf-8\r\n"
+                f"Content-Length: {len(body_bytes)}\r\n"
+                "\r\n"
+            ).encode("utf-8") + body_bytes
+            client_socket.sendall(response)
+
+            # Close the client connection after sending the response.
             client_socket.close()
             print("Client connection closed.")
 
