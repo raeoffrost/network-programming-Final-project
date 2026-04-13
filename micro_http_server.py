@@ -35,9 +35,24 @@ def main():
 
             # Receive the request data from the client.
             request_data = client_socket.recv(BUFFER_SIZE)
+            request_text = request_data.decode("utf-8", errors="replace")
 
             print("Raw HTTP request:")
-            print(request_data.decode("utf-8", errors="replace"))
+            print(request_text)
+
+            # Read the first request line and pull out the method and path.
+            request_lines = request_text.splitlines()
+            if request_lines:
+                request_parts = request_lines[0].split()
+                if len(request_parts) >= 2:
+                    method = request_parts[0]
+                    path = request_parts[1]
+                    print(f"Method: {method}")
+                    print(f"Path: {path}")
+                else:
+                    print("Invalid or empty request")
+            else:
+                print("Invalid or empty request")
 
             # Send a basic HTTP response with a simple HTML page.
             body_bytes = HTML_BODY.encode("utf-8")
