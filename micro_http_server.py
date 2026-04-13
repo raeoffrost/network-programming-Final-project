@@ -1,3 +1,4 @@
+import os
 import socket
 
 
@@ -14,6 +15,9 @@ HTML_BODY = """<html>
 
 
 def main():
+    # Get the folder where this script is saved.
+    script_directory = os.path.dirname(os.path.abspath(__file__))
+
     # Create a TCP socket for the server.
     server_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     server_socket.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
@@ -40,6 +44,8 @@ def main():
             print("Raw HTTP request:")
             print(request_text)
 
+            path = "/"
+
             # Read the first request line and pull out the method and path.
             request_lines = request_text.splitlines()
             if request_lines:
@@ -54,8 +60,22 @@ def main():
             else:
                 print("Invalid or empty request")
 
-            # Send a basic HTTP response with a simple HTML page.
-            body_bytes = HTML_BODY.encode("utf-8")
+            # Use the request path to look for a local HTML file.
+            if path == "/":
+                file_name = "index.html"
+            else:
+                file_name = path.lstrip("/")
+
+            file_path = os.path.join(script_directory, file_name)
+
+            if os.path.isfile(file_path):
+                with open(file_path, "r", encoding="utf-8") as file:
+                    response_body = file.read()
+            else:
+                response_body = HTML_BODY
+
+            # Send a basic HTTP response with the file contents or default page.
+            body_bytes = response_body.encode("utf-8")
             response = (
                 "HTTP/1.1 200 OK\r\n"
                 "Content-Type: text/html; charset=utf-8\r\n"
