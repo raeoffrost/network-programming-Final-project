@@ -12,6 +12,13 @@ HTML_BODY = """<html>
     <p>This is a basic response from my Python socket server.</p>
 </body>
 </html>"""
+NOT_FOUND_BODY = """<html>
+<head><title>404 Not Found</title></head>
+<body>
+    <h1>404 Not Found</h1>
+    <p>The file you requested was not found.</p>
+</body>
+</html>"""
 
 
 def main():
@@ -71,17 +78,20 @@ def main():
             if os.path.isfile(file_path):
                 with open(file_path, "r", encoding="utf-8") as file:
                     response_body = file.read()
+                status_line = "HTTP/1.1 200 OK\r\n"
             else:
-                response_body = HTML_BODY
+                response_body = NOT_FOUND_BODY
+                status_line = "HTTP/1.1 404 Not Found\r\n"
 
-            # Send a basic HTTP response with the file contents or default page.
+            # Send a basic HTTP response with the file contents or 404 page.
             body_bytes = response_body.encode("utf-8")
-            response = (
-                "HTTP/1.1 200 OK\r\n"
-                "Content-Type: text/html; charset=utf-8\r\n"
-                f"Content-Length: {len(body_bytes)}\r\n"
-                "\r\n"
-            ).encode("utf-8") + body_bytes
+            response_headers = (
+                status_line
+                + "Content-Type: text/html; charset=utf-8\r\n"
+                + f"Content-Length: {len(body_bytes)}\r\n"
+                + "\r\n"
+            )
+            response = response_headers.encode("utf-8") + body_bytes
             client_socket.sendall(response)
 
             # Close the client connection after sending the response.
