@@ -5,13 +5,6 @@ import socket
 HOST = "127.0.0.1"
 PORT = 8080
 BUFFER_SIZE = 4096
-HTML_BODY = """<html>
-<head><title>My Micro Server</title></head>
-<body>
-    <h1>It works!</h1>
-    <p>This is a basic response from my Python socket server.</p>
-</body>
-</html>"""
 NOT_FOUND_BODY = """<html>
 <head><title>404 Not Found</title></head>
 <body>
